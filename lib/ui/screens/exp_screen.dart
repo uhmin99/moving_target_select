@@ -4,13 +4,16 @@ import 'package:moving_target_select/consts/core_consts.dart';
 import 'package:provider/provider.dart';
 
 import '../../consts/ui_consts.dart';
-import '../../core/acc_animation.dart';
+import '../../entity/exp_entity.dart';
 import '../states/exp_states.dart';
 import '../widgets/ball_widget.dart';
 import 'finish_screen.dart';
 
 class ExpScreen extends StatefulWidget {
-  const ExpScreen({super.key});
+  final ExpEntity expEnv;
+  // ExpEntity(, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow);
+
+  const ExpScreen({super.key, required this.expEnv});
 
   @override
   _ExpScreenState createState() => _ExpScreenState();
@@ -30,10 +33,15 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
       vsync: this,
     );
 
-    final curvedAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: AccelerationCurve(steepness: 2), // Use your custom curve here
-    );
+    final CurvedAnimation curvedAnimation;
+
+    if(widget.expEnv.expType==ExpType.acc){
+      curvedAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    } else if(widget.expEnv.expType==ExpType.deAcc){
+      curvedAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    } else {
+      curvedAnimation = CurvedAnimation(parent: _controller, curve: Curves.linear);
+    }
 
     _animation = Tween(begin: 0.0, end: windowSize.width+ballSize).animate(curvedAnimation)
       ..addListener(() {
@@ -59,22 +67,24 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
         onKey: (FocusNode node, RawKeyEvent event) {
           if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {            
             // Check if the ball is within the target zone
-            if (_animation.value >= targetZoneStart && _animation.value <= targetZoneStart + targetZoneWidth - ballSize) {
+            if (_animation.value >= widget.expEnv.zonePositionX && _animation.value <= widget.expEnv.zonePositionX + widget.expEnv.zoneWidth - ballSize) {
               // Success
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text('성공', style: TextStyle(color: Colors.green)),
-                    content: Text('Target을 맞추었습니다.\n\nOk를 눌러서 다음으로 진행하세요.'),
+                    title: const Text('성공', style: TextStyle(color: Colors.green)),
+                    content: const Text('Target을 맞추었습니다.\n\nOk를 눌러서 다음으로 진행하세요.'),
                     actions: <Widget>[
                       TextButton(
-                        child: Text('OK'),
+                        child: const Text('OK'),
                         onPressed: () {
-                          var successData = [{
-                            'name': context.read<UserNameState>().name,
-                            'result': 'success',
-                          }];
+                          ExpResultEntity successData = ExpResultEntity(
+                            expEntity: widget.expEnv,
+                            success: true,
+                            timingAccuracy: 0.0,  //TODO: add timing accuracy
+                            errorType: ErrorType.no_error_success
+                          );
                           toNextExperiment(context, successData);
                         },
                       ),
@@ -83,21 +93,24 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                 },
               );
             } else {
+              // TODO: add what the error type is
               // Failure
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text('실패', style: TextStyle(color: Colors.red)),
-                    content: Text('Target을 못 맞추었습니다.\n\nOk를 눌러서 다음으로 진행하세요.'),
+                    title: const Text('실패', style: TextStyle(color: Colors.red)),
+                    content: const Text('Target을 못 맞추었습니다.\n\nOk를 눌러서 다음으로 진행하세요.'),
                     actions: <Widget>[
                       TextButton(
-                        child: Text('OK'),
+                        child: const Text('OK'),
                         onPressed: () {
-                          var failedData = [{
-                            'name': context.read<UserNameState>().name,
-                            'result': 'failed',
-                          }];
+                          ExpResultEntity failedData = ExpResultEntity(
+                            expEntity: widget.expEnv,
+                            success: false,
+                            timingAccuracy: 0.0,  //TODO: add timing accuracy
+                            errorType: ErrorType.miss //TODO: add what the error type is
+                          );
                           toNextExperiment(context, failedData);
                         },
                       ),
@@ -121,11 +134,11 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                 child: BallWidget(),
               ),
               Positioned(
-                left: targetZoneStart, // Align to the right side
+                left: widget.expEnv.zonePositionX, // Align to the right side
                 top: 0,
                 bottom: 0,
                 child: Container(
-                  width: targetZoneWidth,
+                  width: widget.expEnv.zoneWidth,
                   color: Colors.red.withOpacity(0.5), // Semi-transparent target zone
                 ),
               ),
@@ -135,7 +148,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                 child: Column(
                   children: [
                     Text(
-                      context.watch<UserNameState>().name,
+                      context.watch<UserInfoState>().name,
                       style: const TextStyle(fontSize: 20, color: Colors.grey)
                     ),
                     Text(
@@ -160,21 +173,22 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
   }
 }
 
-void toNextExperiment(BuildContext context, var thisData) {
+void toNextExperiment(BuildContext context, ExpResultEntity thisData) {
   context.read<ExpResultState>().append(thisData);
 
   if (context.read<ExpReserveState>().isEmpty()) {
     Navigator.of(context).pop();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FinishScreen()),
+      MaterialPageRoute(builder: (context) => const FinishScreen()),
     );
   } else {
-    context.read<ExpReserveState>().removeLast();
+    context.read<ExpReserveState>().removeFirst();
+    ExpEntity nextExp = context.read<ExpReserveState>().getFirst();
     Navigator.of(context).pop();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ExpScreen()),
+      MaterialPageRoute(builder: (context) => ExpScreen(expEnv: nextExp,)),
     );
   }
 }

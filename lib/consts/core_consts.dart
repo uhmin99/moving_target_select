@@ -1,38 +1,43 @@
-enum ExpType  {
-  acc,
-  deAcc,
-  uniSpeed
-}
+import '../entity/exp_entity.dart';
 
-const accExpList = [
-  {'exp_type':ExpType.acc, 'some_setting':1},
-  // {'exp_type':ExpType.acc, 'some_setting':2},
-  // {'exp_type':ExpType.acc, 'some_setting':3},
-  // {'exp_type':ExpType.acc, 'some_setting':4},
-  // {'exp_type':ExpType.acc, 'some_setting':5},
-  // {'exp_type':ExpType.acc, 'some_setting':6},
-  // {'exp_type':ExpType.acc, 'some_setting':7},
-  // {'exp_type':ExpType.acc, 'some_setting':8},
+double ZoneWidthLarge = 200.0;
+double ZoneWidthSmall = 100.0;
+
+double ZonePositionClose = 400.0;
+double ZonePositionFar = 600.0;
+
+double InitSpeedSlow = 1.0;
+double InitSpeedFast = 3.0;
+
+List<ExpEntity> accExpList = [
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionFar, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionFar, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionClose, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionFar, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.acc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionFar, initSpeed: InitSpeedFast),
 ];
 
-const deAccExpList = [
-  {'exp_type':ExpType.deAcc, 'some_setting':1},
-  // {'exp_type':ExpType.deAcc, 'some_setting':2},
-  // {'exp_type':ExpType.deAcc, 'some_setting':3},
-  // {'exp_type':ExpType.deAcc, 'some_setting':4},
-  // {'exp_type':ExpType.deAcc, 'some_setting':5},
-  // {'exp_type':ExpType.deAcc, 'some_setting':6},
-  // {'exp_type':ExpType.deAcc, 'some_setting':7},
-  // {'exp_type':ExpType.deAcc, 'some_setting':8},
+List<ExpEntity> deAccExpList = [
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionFar, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionFar, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionClose, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionFar, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.deAcc, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionFar, initSpeed: InitSpeedFast),
 ];
 
-const uniSpeedExpList = [
-  {'exp_type':ExpType.uniSpeed, 'some_setting':1},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':2},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':3},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':4},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':5},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':6},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':7},
-  // {'exp_type':ExpType.uniSpeed, 'some_setting':8},
+List<ExpEntity> uniSpeedExpList = [
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionClose, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionFar, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthLarge, zonePositionX: ZonePositionFar, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionClose, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionClose, initSpeed: InitSpeedFast),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionFar, initSpeed: InitSpeedSlow),
+  ExpEntity(expType: ExpType.uniSpeed, zoneWidth: ZoneWidthSmall, zonePositionX: ZonePositionFar, initSpeed: InitSpeedFast),
 ];

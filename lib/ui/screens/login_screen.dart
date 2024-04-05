@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:moving_target_select/consts/core_consts.dart';
+import 'package:moving_target_select/ui/screens/finish_screen.dart';
 import 'package:provider/provider.dart';
 
+import '../../entity/exp_entity.dart';
 import '../states/exp_states.dart';
 import '../screens/exp_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  final TextEditingController nameInputController = TextEditingController();
-  final TextEditingController pwInputController = TextEditingController();
-
+class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController nameInputController = TextEditingController();
+  final TextEditingController ageInputController = TextEditingController();
+
+  String _gender='남성';
+  List<String> genderList = ['남성', '여성', '성별선택안함'];
 
   @override
   Widget build(BuildContext context) {
@@ -21,24 +31,44 @@ class LoginScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: <Widget>[
+            const Text(
+              'Team POTG : Moving Target Select Experiment',
+              style: TextStyle(fontSize: 30),
+            ),
             TextField(
               controller: nameInputController,
               decoration: const InputDecoration(
-                labelText: 'Name',
+                labelText: '이름',
               ),
             ),
             TextField(
-              controller: pwInputController,
+              controller: ageInputController,
               decoration: const InputDecoration(
-                labelText: 'Password',
+                labelText: '나이',
               ),
-              obscureText: true,
             ),
-            SizedBox(height: 40),
+            DropdownButton<String>(
+              hint: const Text('성별'),
+              onChanged: (selectedGender) {
+                setState(() {
+                  _gender = selectedGender!;
+                });
+              },
+              value: _gender,
+              items: genderList.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 40),
             ElevatedButton(
               child: const Text('Start'),
               onPressed: () {
-                context.read<UserNameState>().setName(nameInputController.text);
+                context.read<UserInfoState>().setName(nameInputController.text);
+                context.read<UserInfoState>().setAge(ageInputController.text);
+                context.read<UserInfoState>().setGender(_gender);
                 startExperiment(context);
               },
             ),
@@ -75,20 +105,20 @@ class LoginScreen extends StatelessWidget {
 }
 
 void startExperiment(BuildContext context) {
-  var expReadyQueue = [];
+  List<ExpEntity> expReadyQueue = [];
 
-  var accCaseList = List.from(accExpList);
-  var deAccCaseList = List.from(deAccExpList);
-  var uniSpeedCaseList = List.from(uniSpeedExpList);
+  List<ExpEntity> accCaseList = List.from(accExpList);
+  List<ExpEntity> deAccCaseList = List.from(deAccExpList);
+  List<ExpEntity> uniSpeedCaseList = List.from(uniSpeedExpList);
 
   accCaseList.shuffle();
   deAccCaseList.shuffle();
   uniSpeedCaseList.shuffle();
 
   //randomlly append all three case lists
-  var caseLists = ['accCaseList', 'deAccCaseList', 'uniSpeedCaseList']..shuffle();
+  var randomCaseList = ['accCaseList', 'deAccCaseList', 'uniSpeedCaseList']..shuffle();
 
-  for (var list in caseLists) {
+  for (var list in randomCaseList) {
     if (list == 'accCaseList') {
       expReadyQueue.addAll(accCaseList);
     } else if (list == 'deAccCaseList') {
@@ -98,10 +128,22 @@ void startExperiment(BuildContext context) {
     }
   }
 
+  if (expReadyQueue.isEmpty) {
+    // No experiments to be done
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FinishScreen()),
+    );
+    return;
+  }
+
+  ExpEntity nextExp = expReadyQueue[0];
+  expReadyQueue.removeAt(0);
+
   context.read<ExpReserveState>().setReserveList(expReadyQueue);
   
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => ExpScreen()),
+    MaterialPageRoute(builder: (context) => ExpScreen(expEnv: nextExp,)),
   );
 }

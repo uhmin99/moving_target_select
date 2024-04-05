@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => UserNameState()),
+        ChangeNotifierProvider(create: (context) => UserInfoState()),
         ChangeNotifierProvider(create: (context) => ExpReserveState()),
         ChangeNotifierProvider(create: (context) => ExpResultState()),
       ],

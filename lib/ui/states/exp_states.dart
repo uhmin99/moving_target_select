@@ -1,27 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
+import 'package:moving_target_select/entity/exp_entity.dart';
 
-class UserNameState with ChangeNotifier {
-  String _name = "Unknown";
+class UserInfoState with ChangeNotifier {
+  String _name = "Unset";
+  String _gender = "Unset";
+  String _age = "Unset";
 
   String get name => _name;
+  String get gender => _gender;
+  String get age => _age;
 
   void setName(String newName) {
     _name = newName;
     notifyListeners();
   }
+
+  void setGender(String newGender) {
+    _gender = newGender;
+    notifyListeners();
+  }
+
+  void setAge(String newAge) {
+    _age = newAge;
+    notifyListeners();
+  }
 }
 
 class ExpReserveState with ChangeNotifier {
-  // TODO : Implement the ExpReserve class. 실험 예약에 뭐가 들어가야되는지 나타내는 클라스 만들기고 적용
-  var _reserve = [];
+  List<ExpEntity> _reserve = [];
 
-  get reserve => _reserve;
+  List<ExpEntity> get reserve => _reserve;
 
   void append(data) {
     _reserve.add(data);
     notifyListeners();
+  }
+
+  ExpEntity getFirst() {
+    return _reserve[0];
   }
 
   void reset() {
@@ -29,8 +45,8 @@ class ExpReserveState with ChangeNotifier {
     notifyListeners();
   }
 
-  void removeLast() {
-    _reserve.removeLast();
+  void removeFirst() {
+    _reserve.removeAt(0);
     notifyListeners();
   }
 
@@ -48,7 +64,7 @@ class ExpReserveState with ChangeNotifier {
     notifyListeners();
   }
 
-  void setReserveList(List data) {
+  void setReserveList(List<ExpEntity> data) {
     _reserve = data;
     notifyListeners();
   }
@@ -59,10 +75,9 @@ class ExpReserveState with ChangeNotifier {
 }
 
 class ExpResultState with ChangeNotifier {
-  // TODO : Implement the ExpResult class. 실험 결과에 뭐가 들어가야되는지 나타내는 클라스 만들기고 적용
-  List<List<dynamic>?> _result = [];
+  List<ExpResultEntity> _result = [];
 
-  get result => _result;
+  List<ExpResultEntity> get result => _result;
 
   void append(data) {
     _result.add(data);

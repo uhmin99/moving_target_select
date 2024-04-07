@@ -13,4 +13,6 @@ class AccelerationCurve extends Curve {
     // Higher values of steepness result in faster acceleration
     return pow(t, steepness).toDouble();
   }
+
+  
 }

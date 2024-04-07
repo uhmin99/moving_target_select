@@ -20,15 +20,18 @@ class ExpScreen extends StatefulWidget {
 }
 
 class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _ballController;
   late Animation _animation;
   FocusNode _focusNode = FocusNode();
+  late DateTime _startTime;
+  
 
   @override
   void initState() {
     super.initState();
+
     _focusNode.requestFocus();
-    _controller = AnimationController(
+    _ballController = AnimationController(
       duration: const Duration(seconds: 5), // Adjust as needed
       vsync: this,
     );
@@ -36,11 +39,23 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
     final CurvedAnimation curvedAnimation;
 
     if(widget.expEnv.expType==ExpType.acc){
-      curvedAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+      Curve curvetype;
+      if(widget.expEnv.speed == SpeedType.slow){
+        curvetype = Curves.easeInCubic;
+      } else {
+        curvetype = Curves.easeInExpo;
+      }
+      curvedAnimation = CurvedAnimation(parent: _ballController, curve: curvetype);
     } else if(widget.expEnv.expType==ExpType.deAcc){
-      curvedAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+      Curve curvetype;
+      if(widget.expEnv.speed == SpeedType.slow){
+        curvetype = Curves.easeOutCubic;
+      } else {
+        curvetype = Curves.easeOutExpo;
+      }
+      curvedAnimation = CurvedAnimation(parent: _ballController, curve: curvetype);
     } else {
-      curvedAnimation = CurvedAnimation(parent: _controller, curve: Curves.linear);
+      curvedAnimation = CurvedAnimation(parent: _ballController, curve: Curves.linear);
     }
 
     _animation = Tween(begin: 0.0, end: windowSize.width+ballSize).animate(curvedAnimation)
@@ -49,13 +64,38 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          _controller.repeat();
+          _ballController.stop();
+          showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('실패', style: TextStyle(color: Colors.red)),
+                    content: const Text('Target을 못 맞추었습니다.\n\nOk를 눌러서 다음으로 진행하세요.'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('OK'),
+                        onPressed: () {
+                          ExpResultEntity failedData = ExpResultEntity(
+                            expEntity: widget.expEnv,
+                            success: false,
+                            timingAccuracy: TIMING_UNPRESSED,
+                            errorType: ErrorType.miss
+                          );
+                          toNextExperiment(context, failedData);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
         } else if (status == AnimationStatus.dismissed) {
-          _controller.forward();
+          _ballController.forward();
         }
       });
 
-    _controller.forward();
+    _startTime = DateTime.now();
+
+    _ballController.forward();
   }
 
   @override
@@ -65,7 +105,9 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
         autofocus: true,
         focusNode: _focusNode,
         onKey: (FocusNode node, RawKeyEvent event) {
-          if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {            
+          if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {        
+            DateTime endTime = DateTime.now();
+            _ballController.stop();
             // Check if the ball is within the target zone
             if (_animation.value >= widget.expEnv.zonePositionX && _animation.value <= widget.expEnv.zonePositionX + widget.expEnv.zoneWidth - ballSize) {
               // Success
@@ -82,7 +124,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                           ExpResultEntity successData = ExpResultEntity(
                             expEntity: widget.expEnv,
                             success: true,
-                            timingAccuracy: 0.0,  //TODO: add timing accuracy
+                            timingAccuracy: endTime.difference(_startTime).inMilliseconds.toDouble(),
                             errorType: ErrorType.no_error_success
                           );
                           toNextExperiment(context, successData);
@@ -93,7 +135,12 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                 },
               );
             } else {
-              // TODO: add what the error type is
+              ErrorType failType;
+              if (_animation.value < widget.expEnv.zonePositionX) {
+                failType = ErrorType.early;
+              } else {
+                failType = ErrorType.late;
+              }
               // Failure
               showDialog(
                 context: context,
@@ -108,8 +155,8 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                           ExpResultEntity failedData = ExpResultEntity(
                             expEntity: widget.expEnv,
                             success: false,
-                            timingAccuracy: 0.0,  //TODO: add timing accuracy
-                            errorType: ErrorType.miss //TODO: add what the error type is
+                            timingAccuracy: endTime.difference(_startTime).inMilliseconds.toDouble(),
+                            errorType: failType
                           );
                           toNextExperiment(context, failedData);
                         },
@@ -151,8 +198,9 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                       context.watch<UserInfoState>().name,
                       style: const TextStyle(fontSize: 20, color: Colors.grey)
                     ),
+                    Text(expTypeToString(widget.expEnv.expType), style: const TextStyle(fontSize: 20, color: Colors.grey)),
                     Text(
-                      '${(accExpList.length + deAccExpList.length + uniSpeedExpList.length) - context.read<ExpReserveState>().getLength()}/${accExpList.length + deAccExpList.length + uniSpeedExpList.length}',
+                      '${(accExpList.length + deAccExpList.length + uniSpeedExpList.length) - context.read<ExpReserveState>().getLength() + 1}/${accExpList.length + deAccExpList.length + uniSpeedExpList.length}',
                       style: const TextStyle(fontSize: 20, color: Colors.grey)
                     ),
                   ],
@@ -167,7 +215,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ballController.dispose();
     _focusNode.dispose();
     super.dispose();
   }

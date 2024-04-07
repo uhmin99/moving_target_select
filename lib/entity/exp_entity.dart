@@ -1,3 +1,5 @@
+import 'package:moving_target_select/consts/core_consts.dart';
+
 enum ExpType  {
   acc,
   deAcc,
@@ -20,22 +22,22 @@ class ExpEntity {
   ExpType expType;
   double zoneWidth;
   double zonePositionX;
-  double initSpeed;
+  SpeedType speed;
 
-  ExpEntity({required this.expType, required this.zoneWidth, required this.zonePositionX, required this.initSpeed});
+  ExpEntity({required this.expType, required this.zoneWidth, required this.zonePositionX, required this.speed});
 
   ExpEntity.fromJson(Map<String, dynamic> json)
     :  expType = json['exp_type'],
       zoneWidth = json['zone_width'],
       zonePositionX = json['zone_position_x'],
-      initSpeed = json['init_speed'];
+      speed = json['speed'];
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['exp_type'] = expType;
     data['zone_width'] = zoneWidth;
     data['zone_position_x'] = zonePositionX;
-    data['init_speed'] = initSpeed;
+    data['speed'] = speed;
     return data;
   }
 }

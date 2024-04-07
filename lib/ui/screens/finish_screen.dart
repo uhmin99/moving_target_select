@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:provider/provider.dart';
 
+import '../../consts/core_consts.dart';
 import '../states/exp_states.dart';
 
 class FinishScreen extends StatelessWidget {
@@ -15,7 +16,7 @@ class FinishScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Finish Screen'),
+        title: const Text('실험 완료'),
       ),
       body: Center(
         child: ListView(
@@ -67,7 +68,7 @@ class FinishScreen extends StatelessWidget {
                           DataCell(Text(item.expEntity.zonePositionX.toString())),
                           DataCell(Text(item.success ? "성공":"실패")),
                           DataCell(Text(item.errorType.toString())),
-                          DataCell(Text(item.timingAccuracy.toString())),
+                          DataCell(Text((item.timingAccuracy==TIMING_UNPRESSED)?"누르지않음":item.timingAccuracy.toString())),
                         ],
                       );
                     }).toList(),
@@ -86,7 +87,7 @@ void saveToCSV(String userName, List<ExpResultEntity> data) async {
   List<List<dynamic>> rows = [];
   rows.add(['가속 타입', 'TZ 넓이', 'TZ 위치', '성공 여부', '실패 타입', '타이밍 정확도']);
   for (var item in data) {
-    rows.add([expTypeToString(item.expEntity.expType), item.expEntity.zoneWidth, item.expEntity.zonePositionX, item.success?"성공":"실패", item.errorType, item.timingAccuracy]);
+    rows.add([expTypeToString(item.expEntity.expType), item.expEntity.zoneWidth, item.expEntity.zonePositionX, item.success?"성공":"실패", item.errorType, (item.timingAccuracy==TIMING_UNPRESSED)?"누르지않음":item.timingAccuracy]);
   }
 
   String csv = const ListToCsvConverter().convert(rows);

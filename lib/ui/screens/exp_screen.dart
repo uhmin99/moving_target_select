@@ -183,7 +183,15 @@ void toNextExperiment(BuildContext context, ExpResultEntity thisData) {
       MaterialPageRoute(builder: (context) => const FinishScreen()),
     );
   } else {
-    context.read<ExpReserveState>().removeFirst();
+    context.read<ExpReserveState>().removeFirst();  // Pop after finishing the current experiment
+    if (context.read<ExpReserveState>().isEmpty()) {
+      Navigator.of(context).pop();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const FinishScreen()),
+      );
+      return;
+    }
     ExpEntity nextExp = context.read<ExpReserveState>().getFirst();
     Navigator.of(context).pop();
     Navigator.push(

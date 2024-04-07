@@ -138,7 +138,6 @@ void startExperiment(BuildContext context) {
   }
 
   ExpEntity nextExp = expReadyQueue[0];
-  expReadyQueue.removeAt(0);
 
   context.read<ExpReserveState>().setReserveList(expReadyQueue);
   

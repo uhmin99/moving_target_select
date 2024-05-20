@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../entity/exp_entity.dart';
 import '../states/exp_states.dart';
 import '../screens/exp_screen.dart';
+import 'guide_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -64,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 40),
             ElevatedButton(
-              child: const Text('Start'),
+              child: const Text('다음'),
               onPressed: () {
                 context.read<UserInfoState>().setName(nameInputController.text);
                 context.read<UserInfoState>().setAge(ageInputController.text);
@@ -73,30 +74,30 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             ),
             SizedBox(height: 100),
-            ElevatedButton(
-              child: const Icon(Icons.info),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('실험 안내'),
-                      content: const Text(
-                        '실험을 시작하려면 이름을 입력하고 Start 버튼을 눌러주세요.\n 실험은 총 24번 진행됩니다....등등 TBD',
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Close'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
+            // ElevatedButton(
+            //   child: const Icon(Icons.info),
+            //   onPressed: () {
+            //     showDialog(
+            //       context: context,
+            //       builder: (BuildContext context) {
+            //         return AlertDialog(
+            //           title: const Text('실험 안내'),
+            //           content: const Text(
+            //             '실험을 시작하려면 이름을 입력하고 Start 버튼을 눌러주세요.\n 실험은 총 24번 진행됩니다....등등 TBD',
+            //           ),
+            //           actions: <Widget>[
+            //             TextButton(
+            //               child: const Text('Close'),
+            //               onPressed: () {
+            //                 Navigator.of(context).pop();
+            //               },
+            //             ),
+            //           ],
+            //         );
+            //       },
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),
@@ -132,7 +133,7 @@ void startExperiment(BuildContext context) {
     // No experiments to be done
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FinishScreen()),
+      MaterialPageRoute(builder: (context) => const FinishScreen()),
     );
     return;
   }
@@ -140,9 +141,9 @@ void startExperiment(BuildContext context) {
   ExpEntity nextExp = expReadyQueue[0];
 
   context.read<ExpReserveState>().setReserveList(expReadyQueue);
-  
+
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => ExpScreen(expEnv: nextExp,)),
+    MaterialPageRoute(builder: (context) => GuideScreen(firstExpEnv: nextExp,)),
   );
 }

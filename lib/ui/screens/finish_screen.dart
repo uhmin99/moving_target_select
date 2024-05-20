@@ -20,7 +20,7 @@ class FinishScreen extends StatelessWidget {
       ),
       body: Center(
         child: ListView(
-          scrollDirection: Axis.horizontal,
+          // scrollDirection: Axis.horizontal,
           children: [
             SingleChildScrollView(
               child: Column(
@@ -31,48 +31,76 @@ class FinishScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                      saveToCSV(context.read<UserInfoState>().name, context.read<ExpResultState>().result);
+                      saveToCSV(context, context.read<ExpResultState>().result, context.read<UserInfoState>().name, context.read<UserInfoState>().age, context.read<UserInfoState>().gender);
                     },
-                    child: const Text('Export to CSV'),
+                    child: const Text('결과 CSV로 추출하기'),
                   ),
                   const SizedBox(height: 30),
                   Text('실험자 : ${context.read<UserInfoState>().name} / 나이 : ${context.read<UserInfoState>().age} / 성별 : ${context.read<UserInfoState>().gender}'),
                   Text('실험날짜 : ${DateTime.now()}'),
-                  DataTable(
-                    columns: const <DataColumn>[
-                      DataColumn(
-                        label: Text('가속 타입'),
-                      ),
-                      DataColumn(
-                        label: Text('TZ 넓이'),
-                      ),
-                      DataColumn(
-                        label: Text('TZ 위치'),
-                      ),
-                      DataColumn(
-                        label: Text('성공 여부'),
-                      ),
-                      DataColumn(
-                        label: Text('실패 타입'),
-                      ),
-                      DataColumn(
-                        label: Text('타이밍 정확도'),
-                      ),
-                      // Add more DataColumn for each column in your data
-                    ],
-                    rows: context.watch<ExpResultState>().result.map<DataRow>((item) {
-                      return DataRow(
-                        cells: <DataCell>[
-                          DataCell(Text(expTypeToString(item.expEntity.expType))),
-                          DataCell(Text(item.expEntity.zoneWidth.toString())),
-                          DataCell(Text(item.expEntity.zonePositionX.toString())),
-                          DataCell(Text(item.success ? "성공":"실패")),
-                          DataCell(Text(item.errorType.toString())),
-                          DataCell(Text((item.timingAccuracy==TIMING_UNPRESSED)?"누르지않음":item.timingAccuracy.toString())),
-                        ],
-                      );
-                    }).toList(),
-                  ),
+                  // DataTable(
+                  //   columns: const <DataColumn>[
+                  //     DataColumn(
+                  //       label: Text('가속 타입'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('타겟 등장 주기'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('타겟 도착 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('타겟 머무르는 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('실 등장 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('실 도착 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('실 탈출 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('버튼 누른 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('등장~도착 시간'),
+                  //     ),
+                  //     DataColumn(
+                  //       label: Text('존 안에 머무르는 시간'),
+                  //     ),
+                  //   ],
+                  //   rows: context.watch<ExpResultState>().result.map<DataRow>((item) {
+                  //     String appearToArrival;
+                  //     String zoneStayTime;
+                  //     if(item.zoneArrivalTime != null && item.targetAppearanceTime != null) {
+                  //       appearToArrival = item.zoneArrivalTime!.difference(item.targetAppearanceTime!).inMilliseconds.toString();
+                  //     } else {
+                  //       appearToArrival = 'N/A';
+                  //     }
+
+                  //     if(item.zoneLeaveTime != null && item.zoneArrivalTime != null) {
+                  //       zoneStayTime = item.zoneLeaveTime!.difference(item.zoneArrivalTime!).inMilliseconds.toString();
+                  //     } else {
+                  //       zoneStayTime = 'N/A';
+                  //     }
+                  //     return DataRow(
+                  //       cells: <DataCell>[
+                  //         DataCell(Text(expTypeToString(item.expEntity.expType))),
+                  //         DataCell(Text(item.expEntity.targetAppearancePeriod.toString())),
+                  //         DataCell(Text(item.expEntity.zoneArrivalTime.toString())),
+                  //         DataCell(Text(item.expEntity.zoneStayTime.toString())),
+                  //         DataCell(Text(item.targetAppearanceTime.toString())),
+                  //         DataCell(Text(item.zoneArrivalTime.toString())),
+                  //         DataCell(Text(item.zoneLeaveTime.toString())),
+                  //         DataCell(Text(item.buttonPressTime.toString())),
+                  //         DataCell(Text(appearToArrival)),
+                  //         DataCell(Text(zoneStayTime)),
+                  //       ],
+                  //     );
+                  //   }).toList(),
+                  // ),
                 ],
               ),
             )
@@ -83,18 +111,69 @@ class FinishScreen extends StatelessWidget {
   }
 }
 
-void saveToCSV(String userName, List<ExpResultEntity> data) async {
-  List<List<dynamic>> rows = [];
-  rows.add(['가속 타입', 'TZ 넓이', 'TZ 위치', '성공 여부', '실패 타입', '타이밍 정확도']);
-  for (var item in data) {
-    rows.add([expTypeToString(item.expEntity.expType), item.expEntity.zoneWidth, item.expEntity.zonePositionX, item.success?"성공":"실패", item.errorType, (item.timingAccuracy==TIMING_UNPRESSED)?"누르지않음":item.timingAccuracy]);
+void saveToCSV(BuildContext context, List<ExpResultEntity> data, String userName, String age, String gender) async {
+  try {
+    List<List<dynamic>> rows = [];
+    rows.add(['실험자', '나이', '성별']);
+    rows.add([userName, age, gender]);
+    rows.add(['가속 타입', '타겟 등장 주기', '타겟 도착 시간', '타겟 머무르는 시간', '성공 여부', '실패 타입', '실 등장 시간', '실 도착 시간', '버튼 누른 시간']);
+    for (var item in data) {
+      rows.add([
+        expTypeToString(item.expEntity.expType),  //가속 타입
+        item.expEntity.targetAppearancePeriod,  //타겟 등장 주기
+        item.expEntity.zoneArrivalTime, //타겟 도착 시간
+        item.expEntity.zoneStayTime,  //타겟 머무르는 시간
+        item.success?"성공":"실패", //성공 여부
+        item.errorType, //실패 타입
+        item.targetAppearanceTime,  //실 등장 시간
+        item.zoneArrivalTime, //실 도착 시간
+        item.buttonPressTime, //버튼 누른 시간
+      ]);
+    }
+
+    String csv = const ListToCsvConverter().convert(rows);
+    final directory = Directory.current;
+    String currentTimeString = DateTime.now().toString();
+    final file = File('${directory.path}/${userName}_potg_result_$currentTimeString.csv');
+    File resultFile = await file.writeAsString(csv);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('CSV 저장 완료'),
+          content: Text('결과가 다음 경로에 저장되었습니다:\n${resultFile.path}'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+    print('CSV saved to ${file.path}');
+    
+  } catch (e) {
+    print(e);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('CSV 저장 실패'),
+          content: Text('CSV 저장에 실패했습니다. 다시 시도해주세요.\nError: $e'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
   }
-
-  String csv = const ListToCsvConverter().convert(rows);
-  final directory = Directory.current;
-  String currentTimeString = DateTime.now().toString();
-  final file = File('${directory.path}/${userName}_potg_result_$currentTimeString.csv');
-  await file.writeAsString(csv);
-
-  print('CSV saved to ${file.path}');
 }

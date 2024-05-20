@@ -133,7 +133,7 @@ void saveToCSV(BuildContext context, List<ExpResultEntity> data, String userName
 
     String csv = const ListToCsvConverter().convert(rows);
     final directory = Directory.current;
-    String currentTimeString = DateTime.now().toString();
+    String currentTimeString = DateTime.now().hour.toString() + DateTime.now().minute.toString() + DateTime.now().second.toString();
     final file = File('${directory.path}/${userName}_potg_result_$currentTimeString.csv');
     File resultFile = await file.writeAsString(csv);
 

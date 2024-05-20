@@ -303,10 +303,10 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                       'Trial : ${widget.trialCount}/${TRIAL_PER_EXP}',
                       style: exp_top_indicator_style
                     ),
-                    Text(
-                      'Type : ${expTypeToString(widget.expEnv.expType)}, Appear : ${widget.expEnv.targetAppearancePeriod} ms, Stay : ${widget.expEnv.zoneStayTime} ms, Arrival : ${widget.expEnv.zoneArrivalTime} ms',
-                      style: exp_top_indicator_style
-                    ),
+                    // Text(
+                    //   'Type : ${expTypeToString(widget.expEnv.expType)}, Appear : ${widget.expEnv.targetAppearancePeriod} ms, Stay : ${widget.expEnv.zoneStayTime} ms, Arrival : ${widget.expEnv.zoneArrivalTime} ms',
+                    //   style: exp_top_indicator_style
+                    // ),
                   ],
                 ),
               ),

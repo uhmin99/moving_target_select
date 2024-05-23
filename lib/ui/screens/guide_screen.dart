@@ -23,7 +23,11 @@ class GuideScreen extends StatelessWidget {
             print('S key pressed');
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ExpScreen(expEnv: firstExpEnv, trialCount: 1,)),
+              PageRouteBuilder(
+                pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: firstExpEnv, trialCount: 1, isFirst: true,),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              )
             );
             return KeyEventResult.handled;
           } else {
@@ -56,7 +60,7 @@ class GuideScreen extends StatelessWidget {
                   (모든 새롭게 등장하는 타겟에 대해 한번의 버튼 입력 필수)
 
                   한번 게임을 시작하면 요구하는 수행횟수를 충족시킬 때까지 자리를 비우거나 게임을 멈추지 마세요.
-                  40번의 수행횟수가 36번개의 조건으로 반복됩니다.
+                  40번의 수행횟수가 18번개의 조건으로 반복됩니다.
 
                   시작을 위해서 S 키를 누르세요.
 

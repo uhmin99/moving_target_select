@@ -20,7 +20,7 @@ class FinishScreen extends StatelessWidget {
       ),
       body: Center(
         child: ListView(
-          // scrollDirection: Axis.horizontal,
+          scrollDirection: Axis.horizontal,
           children: [
             SingleChildScrollView(
               child: Column(
@@ -38,69 +38,73 @@ class FinishScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   Text('실험자 : ${context.read<UserInfoState>().name} / 나이 : ${context.read<UserInfoState>().age} / 성별 : ${context.read<UserInfoState>().gender}'),
                   Text('실험날짜 : ${DateTime.now()}'),
-                  // DataTable(
-                  //   columns: const <DataColumn>[
-                  //     DataColumn(
-                  //       label: Text('가속 타입'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('타겟 등장 주기'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('타겟 도착 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('타겟 머무르는 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('실 등장 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('실 도착 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('실 탈출 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('버튼 누른 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('등장~도착 시간'),
-                  //     ),
-                  //     DataColumn(
-                  //       label: Text('존 안에 머무르는 시간'),
-                  //     ),
-                  //   ],
-                  //   rows: context.watch<ExpResultState>().result.map<DataRow>((item) {
-                  //     String appearToArrival;
-                  //     String zoneStayTime;
-                  //     if(item.zoneArrivalTime != null && item.targetAppearanceTime != null) {
-                  //       appearToArrival = item.zoneArrivalTime!.difference(item.targetAppearanceTime!).inMilliseconds.toString();
-                  //     } else {
-                  //       appearToArrival = 'N/A';
-                  //     }
+                  DataTable(
+                    columns: const <DataColumn>[
+                      DataColumn(
+                        label: Text('가속 타입'),
+                      ),
+                      DataColumn(
+                        label: Text('타겟 등장 주기'),
+                      ),
+                      DataColumn(
+                        label: Text('타겟 도착 시간'),
+                      ),
+                      // DataColumn(
+                      //   label: Text('타겟 머무르는 시간'),
+                      // ),
+                      DataColumn(
+                        label: Text('실 등장 시간'),
+                      ),
+                      // DataColumn(
+                      //   label: Text('실 도착 시간'),
+                      // ),
+                      // DataColumn(
+                      //   label: Text('실 탈출 시간'),
+                      // ),
+                      DataColumn(
+                        label: Text('버튼 누른 시간'),
+                      ),
+                      // DataColumn(
+                      //   label: Text('등장~도착 시간'),
+                      // ),
+                      // DataColumn(
+                      //   label: Text('존 안에 머무르는 시간'),
+                      // ),
+                      DataColumn(
+                        label: Text('등장~버튼누른시간ms'),
+                      ),
+                    ],
+                    rows: context.watch<ExpResultState>().result.map<DataRow>((item) {
+                      // String appearToArrival;
+                      // String zoneStayTime;
+                      // if(item.zoneArrivalTime != null && item.targetAppearanceTime != null) {
+                      //   appearToArrival = item.zoneArrivalTime!.difference(item.targetAppearanceTime!).inMilliseconds.toString();
+                      // } else {
+                      //   appearToArrival = 'N/A';
+                      // }
 
-                  //     if(item.zoneLeaveTime != null && item.zoneArrivalTime != null) {
-                  //       zoneStayTime = item.zoneLeaveTime!.difference(item.zoneArrivalTime!).inMilliseconds.toString();
-                  //     } else {
-                  //       zoneStayTime = 'N/A';
-                  //     }
-                  //     return DataRow(
-                  //       cells: <DataCell>[
-                  //         DataCell(Text(expTypeToString(item.expEntity.expType))),
-                  //         DataCell(Text(item.expEntity.targetAppearancePeriod.toString())),
-                  //         DataCell(Text(item.expEntity.zoneArrivalTime.toString())),
-                  //         DataCell(Text(item.expEntity.zoneStayTime.toString())),
-                  //         DataCell(Text(item.targetAppearanceTime.toString())),
-                  //         DataCell(Text(item.zoneArrivalTime.toString())),
-                  //         DataCell(Text(item.zoneLeaveTime.toString())),
-                  //         DataCell(Text(item.buttonPressTime.toString())),
-                  //         DataCell(Text(appearToArrival)),
-                  //         DataCell(Text(zoneStayTime)),
-                  //       ],
-                  //     );
-                  //   }).toList(),
-                  // ),
+                      // if(item.zoneLeaveTime != null && item.zoneArrivalTime != null) {
+                      //   zoneStayTime = item.zoneLeaveTime!.difference(item.zoneArrivalTime!).inMilliseconds.toString();
+                      // } else {
+                      //   zoneStayTime = 'N/A';
+                      // }
+                      return DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text(expTypeToString(item.expEntity.expType))),
+                          DataCell(Text(item.expEntity.targetAppearancePeriod.toString())),
+                          DataCell(Text(item.expEntity.zoneArrivalTime.toString())),
+                          // DataCell(Text(item.expEntity.zoneStayTime.toString())),
+                          DataCell(Text(item.targetAppearanceTime.toString())),
+                          // DataCell(Text(item.zoneArrivalTime.toString())),
+                          // DataCell(Text(item.zoneLeaveTime.toString())),
+                          DataCell(Text(item.buttonPressTime.toString())),
+                          // DataCell(Text(appearToArrival)),
+                          // DataCell(Text(zoneStayTime)),
+                          DataCell(Text((item.targetAppearanceTime != null && item.buttonPressTime != null) ? item.buttonPressTime!.difference(item.targetAppearanceTime!).inMilliseconds.toString() : 'N/A')),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ],
               ),
             )
@@ -114,20 +118,20 @@ class FinishScreen extends StatelessWidget {
 void saveToCSV(BuildContext context, List<ExpResultEntity> data, String userName, String age, String gender) async {
   try {
     List<List<dynamic>> rows = [];
-    rows.add(['실험자', '나이', '성별']);
+    rows.add(['name', 'age', 'gender']);
     rows.add([userName, age, gender]);
-    rows.add(['가속 타입', '타겟 등장 주기', '타겟 도착 시간', '타겟 머무르는 시간', '성공 여부', '실패 타입', '실 등장 시간', '실 도착 시간', '버튼 누른 시간']);
+    rows.add(['mv_type', 'p', 'tc', 'appeared_t', 'pressed_t', 'appear_to_press_t_ms']);
     for (var item in data) {
       rows.add([
         expTypeToString(item.expEntity.expType),  //가속 타입
         item.expEntity.targetAppearancePeriod,  //타겟 등장 주기
         item.expEntity.zoneArrivalTime, //타겟 도착 시간
-        item.expEntity.zoneStayTime,  //타겟 머무르는 시간
-        item.success?"성공":"실패", //성공 여부
-        item.errorType, //실패 타입
+        // item.success?"성공":"실패", //성공 여부
+        // item.errorType, //실패 타입
         item.targetAppearanceTime,  //실 등장 시간
-        item.zoneArrivalTime, //실 도착 시간
+        // item.zoneArrivalTime, //실 도착 시간
         item.buttonPressTime, //버튼 누른 시간
+        (item.targetAppearanceTime != null && item.buttonPressTime != null) ? item.buttonPressTime?.difference(item.targetAppearanceTime!).inMilliseconds : 'N/A' //등장~버튼누른시간ms
       ]);
     }
 
@@ -155,7 +159,7 @@ void saveToCSV(BuildContext context, List<ExpResultEntity> data, String userName
       },
     );
     print('CSV saved to ${file.path}');
-    
+
   } catch (e) {
     print(e);
     showDialog(

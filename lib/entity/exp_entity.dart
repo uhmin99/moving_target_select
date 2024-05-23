@@ -80,22 +80,22 @@ class ExpResultEntity{
   ExpEntity expEntity;
   int trialNum;
   bool success;
-  double timingAccuracy;
+  // double timingAccuracy;
   ErrorType errorType;
   DateTime? targetAppearanceTime;
-  DateTime? zoneArrivalTime;
-  DateTime? zoneLeaveTime;
+  // DateTime? zoneArrivalTime;
+  // DateTime? zoneLeaveTime;
   DateTime? buttonPressTime;
 
   ExpResultEntity({
     required this.expEntity,
     required this.trialNum,
     required this.success,
-    required this.timingAccuracy,
+    // required this.timingAccuracy,
     required this.errorType,
     required this.targetAppearanceTime,
-    required this.zoneArrivalTime,
-    required this.zoneLeaveTime,
+    // required this.zoneArrivalTime,
+    // required this.zoneLeaveTime,
     required this.buttonPressTime
   });
 
@@ -103,11 +103,11 @@ class ExpResultEntity{
       : expEntity = json['exp_entity'],
         trialNum = json['trial_num'],
         success = json['success'],
-        timingAccuracy = json['timing_accuracy'],
+        // timingAccuracy = json['timing_accuracy'],
         errorType = json['error_type'],
         targetAppearanceTime = json['targetAppearanceTime'],
-        zoneArrivalTime = json['zoneArrivalTime'],
-        zoneLeaveTime = json['zoneLeaveTime'],
+        // zoneArrivalTime = json['zoneArrivalTime'],
+        // zoneLeaveTime = json['zoneLeaveTime'],
         buttonPressTime = json['buttonPressTime'];
 
   Map<String, dynamic> toJson() {
@@ -115,11 +115,11 @@ class ExpResultEntity{
     data['exp_entity'] = expEntity;
     data['trial_num'] = trialNum;
     data['success'] = success;
-    data['timing_accuracy'] = timingAccuracy;
+    // data['timing_accuracy'] = timingAccuracy;
     data['error_type'] = errorType;
     data['targetAppearanceTime'] = targetAppearanceTime??'측정안됨';
-    data['zoneArrivalTime'] = zoneArrivalTime??'측정안됨';
-    data['zoneLeaveTime'] = zoneLeaveTime??'측정안됨';
+    // data['zoneArrivalTime'] = zoneArrivalTime??'측정안됨';
+    // data['zoneLeaveTime'] = zoneLeaveTime??'측정안됨';
     data['buttonPressTime'] = buttonPressTime??'측정안됨';
 
     return data;

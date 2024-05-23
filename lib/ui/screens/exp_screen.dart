@@ -16,8 +16,9 @@ import 'finish_screen.dart';
 class ExpScreen extends StatefulWidget {
   final ExpEntity expEnv;
   final int trialCount;
+  final bool isFirst;
 
-  const ExpScreen({super.key, required this.expEnv, required this.trialCount});
+  const ExpScreen({super.key, required this.expEnv, required this.trialCount, required this.isFirst});
 
   @override
   _ExpScreenState createState() => _ExpScreenState();
@@ -35,7 +36,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
   DateTime? _ballZoneLeaveTime;
   
   Color _targetZoneColor = targetZoneBaseColor;
-  bool _isBallVisible = false;
+  bool _isBallVisible = true;
   bool _expPaused = false;
 
   void _startTrialWithDelay() {
@@ -51,16 +52,62 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
     });
   }
 
-  void showSuccess(BuildContext context) {
-    setState(() {
-      _targetZoneColor = targetZoneSuccessColor;
+  void startBallMovement(BuildContext context) {
+    if(widget.isFirst){
+      setState(() {
+        _isBallVisible = false;
+      });
+      Future.delayed(Duration(milliseconds: startBufferTime), () {
+        setState(() {
+          _isBallVisible = true;
+        });
+        _ballController.forward();
+        _startTime = DateTime.now();
+        _ballAppreanceTime = DateTime.now();
+      });
+
+    } else {
+      _ballController.forward();
+      _startTime = DateTime.now();
+      _ballAppreanceTime = DateTime.now();
+    }
+  }
+
+  void toNextExpInTiming(BuildContext context){
+    int nextExpTime;
+    if(widget.isFirst){
+      nextExpTime = widget.expEnv.targetAppearancePeriod.toInt() + startBufferTime;
+    } else {
+      nextExpTime = widget.expEnv.targetAppearancePeriod.toInt();
+    }
+    
+    Future.delayed(Duration(milliseconds: nextExpTime), () {
+      if (_expPaused) {
+        return;
+      }
+      ExpResultEntity expResultData = ExpResultEntity(
+        expEntity: widget.expEnv,
+        trialNum: widget.trialCount,
+        success: true,
+        errorType: ErrorType.no_error_success,
+        targetAppearanceTime: _ballAppreanceTime,
+        buttonPressTime: _pressTime
+      );
+      context.read<ExpResultState>().append(expResultData);
+      moveToNextTrial(context);
     });
   }
 
+  void showSuccess(BuildContext context) {
+    // setState(() {
+    //   _targetZoneColor = targetZoneSuccessColor;
+    // });
+  }
+
   void showFailed(ErrorType errorType) {
-    setState(() {
-      _targetZoneColor = targetZoneFailColor;
-    });
+    // setState(() {
+    //   _targetZoneColor = targetZoneFailColor;
+    // });
   }
 
   void moveToNextTrial(BuildContext context) {
@@ -81,7 +128,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: widget.expEnv, trialCount: nextTrialCount,),
+              pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: widget.expEnv, trialCount: nextTrialCount, isFirst: false),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             )
@@ -105,7 +152,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: nextExp, trialCount: 1,),
+              pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: nextExp, trialCount: 1, isFirst: false),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             )
@@ -129,7 +176,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
     final CurvedAnimation curvedAnimation = CurvedAnimation(parent: _ballController, curve: getCurveType(widget.expEnv));
 
     double ballStartingPoint = getStartingPoint(widget.expEnv);
-    double ballEndingPoint = zonePositionX + getZoneWidth(widget.expEnv) + ballSize;
+    double ballEndingPoint = zonePositionX;
     _animation = Tween(begin: ballStartingPoint, end: ballEndingPoint).animate(curvedAnimation)
       ..addListener(() {
         // print(_animation.value);
@@ -146,6 +193,9 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _ballController.stop();
+          setState(() {
+            _isBallVisible = false;
+          });
           showFailed(ErrorType.no_press);
           // DateTime endTime = DateTime.now();
           // ExpResultEntity failedData = ExpResultEntity(
@@ -166,10 +216,8 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
         }
       });
 
-    _startTime = DateTime.now();
-
-    // _ballController.forward();
-    _startTrialWithDelay();
+    startBallMovement(context);
+    toNextExpInTiming(context);
   }
 
   @override
@@ -184,48 +232,48 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
         onKey: (FocusNode node, RawKeyEvent event) {
           if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {
             // setTime for the press
-            _pressTime = DateTime.now();
+            if(_pressTime==null) _pressTime = DateTime.now();
             DateTime endTime = DateTime.now();
             _ballController.stop();
 
             // Check if the ball is within the target zone
-            if (_animation.value + ballSize/2 >= zonePositionX && _animation.value + ballSize/2 <= zonePositionX + _zoneWidth) {
-              showSuccess(context);
-              ExpResultEntity successData = ExpResultEntity(
-                expEntity: widget.expEnv,
-                trialNum: widget.trialCount,
-                success: true,
-                timingAccuracy: endTime.difference(_startTime).inMilliseconds.toDouble(),
-                errorType: ErrorType.no_error_success,
-                targetAppearanceTime: _ballAppreanceTime,
-                zoneArrivalTime: _ballZoneArrivalTime,
-                zoneLeaveTime: _ballZoneLeaveTime,
-                buttonPressTime: _pressTime
-              );
-              context.read<ExpResultState>().append(successData);
-              moveToNextTrial(context);
-            } else {
-              ErrorType failType;
-              if (_animation.value < zonePositionX) {
-                failType = ErrorType.early;
-              } else {
-                failType = ErrorType.late;
-              }
-              showFailed(failType);
-              ExpResultEntity failedData = ExpResultEntity(
-                expEntity: widget.expEnv,
-                trialNum: widget.trialCount,
-                success: false,
-                timingAccuracy: endTime.difference(_startTime).inMilliseconds.toDouble(),
-                errorType: failType,
-                targetAppearanceTime: _ballAppreanceTime,
-                zoneArrivalTime: _ballZoneArrivalTime,
-                zoneLeaveTime: _ballZoneLeaveTime,
-                buttonPressTime: _pressTime
-              );
-              context.read<ExpResultState>().append(failedData);
-              moveToNextTrial(context);
-            }
+            // if (_animation.value + ballSize/2 >= zonePositionX && _animation.value + ballSize/2 <= zonePositionX + _zoneWidth) {
+              // showSuccess(context);
+              // ExpResultEntity successData = ExpResultEntity(
+              //   expEntity: widget.expEnv,
+              //   trialNum: widget.trialCount,
+              //   success: true,
+              //   timingAccuracy: endTime.difference(_startTime).inMilliseconds.toDouble(),
+              //   errorType: ErrorType.no_error_success,
+              //   targetAppearanceTime: _ballAppreanceTime,
+              //   zoneArrivalTime: _ballZoneArrivalTime,
+              //   zoneLeaveTime: _ballZoneLeaveTime,
+              //   buttonPressTime: _pressTime
+              // );
+              // context.read<ExpResultState>().append(successData);
+              // moveToNextTrial(context);
+            // } else {
+              // ErrorType failType;
+              // if (_animation.value < zonePositionX) {
+              //   failType = ErrorType.early;
+              // } else {
+              //   failType = ErrorType.late;
+              // }
+              // showFailed(failType);
+              // ExpResultEntity failedData = ExpResultEntity(
+              //   expEntity: widget.expEnv,
+              //   trialNum: widget.trialCount,
+              //   success: false,
+              //   timingAccuracy: endTime.difference(_startTime).inMilliseconds.toDouble(),
+              //   errorType: failType,
+              //   targetAppearanceTime: _ballAppreanceTime,
+              //   zoneArrivalTime: _ballZoneArrivalTime,
+              //   zoneLeaveTime: _ballZoneLeaveTime,
+              //   buttonPressTime: _pressTime
+              // );
+              // context.read<ExpResultState>().append(failedData);
+              // moveToNextTrial(context);
+            // }
             return KeyEventResult.handled;
 
           } else if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
@@ -250,7 +298,7 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: widget.expEnv, trialCount: widget.trialCount,),
+                            pageBuilder: (context, animation1, animation2) => ExpScreen(expEnv: widget.expEnv, trialCount: widget.trialCount, isFirst: false,),
                             transitionDuration: Duration.zero,
                             reverseTransitionDuration: Duration.zero,
                           )
@@ -303,10 +351,10 @@ class _ExpScreenState extends State<ExpScreen> with SingleTickerProviderStateMix
                       'Trial : ${widget.trialCount}/${TRIAL_PER_EXP}',
                       style: exp_top_indicator_style
                     ),
-                    // Text(
-                    //   'Type : ${expTypeToString(widget.expEnv.expType)}, Appear : ${widget.expEnv.targetAppearancePeriod} ms, Stay : ${widget.expEnv.zoneStayTime} ms, Arrival : ${widget.expEnv.zoneArrivalTime} ms',
-                    //   style: exp_top_indicator_style
-                    // ),
+                    Text(
+                      'Type : ${expTypeToString(widget.expEnv.expType)}, Appear : ${widget.expEnv.targetAppearancePeriod} ms, Stay : ${widget.expEnv.zoneStayTime} ms, Arrival : ${widget.expEnv.zoneArrivalTime} ms',
+                      style: exp_top_indicator_style
+                    ),
                   ],
                 ),
               ),

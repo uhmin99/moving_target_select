@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 const Size windowSize = Size(1100, 800);
 
-const double ballSize = 50.0;
+const double ballSize = 30.0;
 const double ballPositionY = 100.0;
 
-const double zonePositionX = 500.0;
+const double zonePositionX = 750.0;
 
 const Color expBackgroundColor = Color(0xFF000000);
 const Color ballColor = Color.fromARGB(255, 50, 188, 213);

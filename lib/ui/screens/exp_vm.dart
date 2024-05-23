@@ -16,7 +16,7 @@ Curve getCurveType(ExpEntity expEnv) {
   } else if(expEnv.expType==ExpType.deAcc){
     // curveType = DeceleratingCurve(initSpeedDeAcc, deccelerationRate, expEnv.zoneArrivalTime / 1000);
     // curveType = DeceleratingCurve(deccelerationRate);
-    curveType = Curves.easeOutCubic;
+    curveType = Curves.linearToEaseOut;
   } else {
     curveType = Curves.linear;
   }
@@ -26,6 +26,16 @@ Curve getCurveType(ExpEntity expEnv) {
 
 
 double getStartingPoint(ExpEntity expEnv) {
+  double offsetForShort = 90;
+  if(expEnv.zoneArrivalTime == zoneArrivalTime_Short){
+    return zonePositionX - 50;
+  } else if(expEnv.zoneArrivalTime == zoneArrivalTime_Medium){
+    return zonePositionX - 250;
+  } else if(expEnv.zoneArrivalTime == zoneArrivalTime_Long){
+    return zonePositionX - 600;
+  } else {
+    return 0;
+  }
   double startingPoint;
 
   if(expEnv.expType==ExpType.acc){
@@ -133,6 +143,7 @@ double getStartingPoint(ExpEntity expEnv) {
 }
 
 int getBallSpeedDuration(ExpEntity expEnv) {
+  return expEnv.zoneArrivalTime.toInt();
   // bigger the value, slower the ball speed
   int ballSpeedDuration;
   if(expEnv.expType==ExpType.acc){
@@ -240,6 +251,7 @@ int getBallSpeedDuration(ExpEntity expEnv) {
 
 
 double getZoneWidth(ExpEntity expEnv) {
+  return 5;
   double zoneWidth;
   if(expEnv.expType==ExpType.acc){
     if(expEnv.zoneArrivalTime == zoneArrivalTime_Short){

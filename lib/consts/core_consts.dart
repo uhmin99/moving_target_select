@@ -21,6 +21,7 @@ double targetAppearancePeriod_Long = 1800;
 
 double zoneStayTime_Short = 80;
 double zoneStayTime_Long = 150;
+double zoneStayTime_None = 0;
 
 double zoneArrivalTime_Short = 50;
 double zoneArrivalTime_Medium = 150;
@@ -36,48 +37,78 @@ double initialPosition = 200;
 double initSpeepdAcc = 200;
 double initSpeedDeAcc = 200;
 
+int startBufferTime = 1000; // in milliseconds
+
 // Experiment Types
+// List<ExpEntity> accExpList = [
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
+// ];
+
+// List<ExpEntity> deAccExpList = [
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long)
+// ];
+
+// List<ExpEntity> uniSpeedExpList = [
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
+//   ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long)
+// ];
+
+
 List<ExpEntity> accExpList = [
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
+  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Short, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Medium, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Long, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Short, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Medium, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.acc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Long, zoneStayTime: zoneStayTime_None),
 ];
 
 List<ExpEntity> deAccExpList = [
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long)
+  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Short, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Medium, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Long, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Short, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Medium, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.deAcc, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Long, zoneStayTime: zoneStayTime_None),
 ];
 
 List<ExpEntity> uniSpeedExpList = [
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Short, zoneArrivalTime: zoneArrivalTime_Long),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Short),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Medium),
-  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneStayTime: zoneStayTime_Long, zoneArrivalTime: zoneArrivalTime_Long)
+  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Short, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Medium, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Short, zoneArrivalTime: zoneArrivalTime_Long, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Short, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Medium, zoneStayTime: zoneStayTime_None),
+  ExpEntity(expType: ExpType.uniSpeed, targetAppearancePeriod: targetAppearancePeriod_Long, zoneArrivalTime: zoneArrivalTime_Long, zoneStayTime: zoneStayTime_None),
 ];
